@@ -1,0 +1,30 @@
+#!/bin/bash
+if [ $# -ne 8 ]; then
+    echo "Usage: $0 -w <warn> -c <crit> -u <mysql_user> -p <mysql_passwd>"
+    exit 3
+fi
+
+while getopts w:c:u:p: OPT
+do
+    case $OPT in
+        "w" ) warning="$OPTARG";;
+        "c" ) critical="$OPTARG";;
+        "u" ) mysql_user="$OPTARG";;
+        "p" ) mysql_passwd="$OPTARG";;
+    esac
+done
+
+threads_num=`echo "show global status like 'Threads_connected%';" | mysql -u$mysql_user -p$mysql_passwd | perl -nle 'print "$1" if /Threads_connected\s+(\d+)/;'`
+
+if [ $threads_num -ge $critical ]
+then
+    echo "CRITICAL - Threads_connected: $threads_num"
+    exit 2
+elif [ $threads_num -ge $warning ]
+then
+    echo "WARNING - Threads_connected: $threads_num"
+    exit 1
+else
+    echo "OK - Threads_connected: $threads_num"
+    exit 0
+fi

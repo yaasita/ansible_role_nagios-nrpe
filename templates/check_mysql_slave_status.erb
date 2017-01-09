@@ -1,0 +1,32 @@
+#!/bin/bash
+if [ $# -ne 4 ]; then
+    echo "Usage: $0 -u <mysql_user> -p <mysql_passwd>"
+    exit 3
+fi
+
+while getopts u:p: OPT
+do
+    case $OPT in
+        "u" ) mysql_user="$OPTARG";;
+        "p" ) mysql_passwd="$OPTARG";;
+    esac
+done
+
+#threads_num=`echo "show slave status\G" | mysql -u$mysql_user -p$mysql_passwd | perl -nle 'print "$1" if /Threads_connected\s+(\d+)/;'`
+slave_io=` echo "show slave status\G" | mysql -u$mysql_user -p$mysql_passwd | perl -nle 'print "$1" if /Slave_IO_Running:\s+(\w+)/'`
+slave_sql=`echo "show slave status\G" | mysql -u$mysql_user -p$mysql_passwd | perl -nle 'print "$1" if /Slave_SQL_Running:\s+(\w+)/'`
+#echo $slave_io
+#echo $slave_sql
+
+if [ "$slave_io" != "Yes" ]
+then
+    echo "CRITICAL - Slave_IO_Running: No"
+    exit 2
+elif [ "$slave_sql" != "Yes" ]
+then
+    echo "CRITICAL - Slave_SQL_Running: No"
+    exit 2
+else
+    echo "OK - Slave_Server: Running"
+    exit 0
+fi

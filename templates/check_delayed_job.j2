@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+ps aux | egrep -q "^{{ nagios_nrpe_config.delayed_job_user }}*delayed_job\s+$"
+if [ "$?" != "0" ]
+then
+    echo "CRITICAL - delayed_job: Not Running"
+    exit 2
+else
+    echo "OK - delayed_job: Running"
+    exit 0
+fi

@@ -1,0 +1,18 @@
+---
+
+- name: nagios-nrpe関連パッケージインストール
+  apt: pkg=nagios-nrpe-server state=installed
+
+- name: 設定ファイル更新
+  template: src=nrpe.cfg.j2 dest=/etc/nagios/nrpe.cfg owner=root group=root mode=0644
+  notify: restart nagios-nrpe-server
+  when: nagios_nrpe_setting == true
+
+- name: mailqチェックプラグイン
+  template: src=check_mailq.j2 dest=/usr/lib/nagios/plugins/check_mailq owner=root group=root mode=0755
+
+- name: delayd_jobチェックプラグイン
+  template: src=check_delayed_job.j2 dest=/usr/lib/nagios/plugins/check_delayed_job owner=root group=root mode=0755
+
+- name: メモリチェックプラグイン
+  template: src=check_mem.pl.j2 dest=/usr/lib/nagios/plugins/check_mem.pl owner=root group=root mode=0755

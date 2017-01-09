@@ -1,0 +1,8 @@
+---
+
+# nagios_nrpe
+nagios_nrpe_setting: true
+nagios_nrpe_config:
+  allowed_host: 203.0.113.1
+  check_disk: /dev/vda1
+  delayed_job_user: hoge
